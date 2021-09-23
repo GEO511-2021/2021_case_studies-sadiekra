@@ -24,7 +24,7 @@ plot1 <- ggplot(no_kuwait, aes(x=lifeExp, y=gdpPercap, color=continent,
   ylab("GDP Per Capita") +
   ggtitle("Wealth and Life Expectancy")+
   theme(plot.title = element_text(hjust = 0.5)) +
-  guides(size=guide_legend("Population 100k)"))
+  guides(size=guide_legend("Population 100k"))
 plot1
 
 #plot2 data
@@ -41,10 +41,13 @@ gapminder_continent<- by_continent %>% summarise(
 gapminder_continent
 
 #plot2
-plot2 <- ggplot(gapminder_continent, aes(x=year, y=gdpPercapweighted), color=continent, size=pop/100000)+ 
+plot2 <- ggplot(gapminder, aes(x=year, y=gdpPercap, color=continent, size=pop/100000))+ 
+  geom_line(aes(group=country)) +
   geom_point()+
-  facet_wrap(~continent, nrow=1)+
-  geom_line()+
-  theme_bw()
+  geom_line(gapminder_continent, mapping = aes(year, gdpPercapweighted), col="black") +
+  geom_point(gapminder_continent, mapping = aes(year, gdpPercapweighted), col="black") +
+  guides(size=guide_legend("Population 100k")) +
+  theme_bw() +
+  facet_wrap(~continent, nrow=1)
 plot2
 

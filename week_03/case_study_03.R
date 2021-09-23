@@ -27,6 +27,8 @@ plot1 <- ggplot(no_kuwait, aes(x=lifeExp, y=gdpPercap, color=continent,
   guides(size=guide_legend("Population 100k"))
 plot1
 
+ggsave("Plot1.png", width = 15, height = 5)
+
 #plot2 data
 data(gapminder)
 str(gapminder) 
@@ -48,6 +50,9 @@ plot2 <- ggplot(gapminder, aes(x=year, y=gdpPercap, color=continent, size=pop/10
   geom_point(gapminder_continent, mapping = aes(year, gdpPercapweighted), col="black") +
   guides(size=guide_legend("Population 100k")) +
   theme_bw() +
-  facet_wrap(~continent, nrow=1)
+  facet_wrap(~continent, nrow=1)+
+  ggtitle("Life Expectancy")
 plot2
+
+ggsave("Plot2.png", width = 15, height = 5)
 

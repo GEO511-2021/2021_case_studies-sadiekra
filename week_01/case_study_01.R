@@ -20,7 +20,7 @@ install.packages("ggplot2")
 library(ggplot2)
 
 #Plot the histogram
-qplot(iris_petal_length, 
+ggplot(iris_petal_length, 
       geom = "histogram",
       fill= I("purple"),
       alpha=0.5,

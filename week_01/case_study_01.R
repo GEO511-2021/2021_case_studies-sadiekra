@@ -19,7 +19,7 @@ hist(iris_petal_length,
 install.packages("ggplot2")
 library(ggplot2)
 
-#Plot the histogram
+#Plot the histogram 
 ggplot(iris_petal_length, 
       geom = "histogram",
       fill= I("purple"),

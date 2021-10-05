@@ -1,11 +1,4 @@
----
-title: "Case Study 05"
-author: Sadie Kratt
-date: 10/5/2021
-output: github_document
----
- ```{r}
- library(spData)
+library(spData)
 library(sf)
 library(tidyverse)
 library(ggplot2)
@@ -53,4 +46,6 @@ library(units)
 intersection %>% 
   st_area() %>%
   set_units(km^2)
-  ```
+
+
+

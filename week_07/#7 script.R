@@ -1,10 +1,3 @@
----
-title: "Case Study 07"
-author: Sadie Kratt
-date: October 20, 2021
-output: github_document
----
-```{r}
 library(tidyverse)
 library(reprex)
 library(sf)
@@ -21,5 +14,3 @@ reprex(venue="gh")
 ggplot(world, aes(x = gdpPercap, color = continent, fill = continent))+
   geom_density(alpha=0.5, color = F)+
   theme(legend.position = "bottom")
-```
-

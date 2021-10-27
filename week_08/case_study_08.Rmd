@@ -23,10 +23,14 @@ view(data)
 #Make a time series with ggplot
 time_series <-ggplot(data, aes(year, mean)) +
   geom_line()
+
 time_series
+
 #Make one table
-knitr::kable(
-  data)
+top_10<-data %>%
+  arrange(desc(mean))%>%
+  top_n(mean,n=10)
+knitr::kable(top_10)
 
 
 

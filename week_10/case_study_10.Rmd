@@ -1,7 +1,143 @@
 ---
 title: "Case Study 10"
-author: Your Name
-date: August 1, 2020
+author: Sadie Kratt
+date: November 9, 2021
 output: github_document
 ---
- 
+```{r}
+#Load needed packages
+library(raster)
+library(rasterVis)
+library(rgdal)
+library(ggmap)
+library(tidyverse)
+library(knitr)
+
+# New Packages
+library(ncdf4) # to import data from netcdf format
+```
+
+```{r}
+#Land Use Cover
+# Create afolder to hold the downloaded data
+dir.create("data",showWarnings = F) #create a folder to hold the data
+
+lulc_url="https://github.com/adammwilson/DataScienceData/blob/master/inst/extdata/appeears/MCD12Q1.051_aid0001.nc?raw=true"
+lst_url="https://github.com/adammwilson/DataScienceData/blob/master/inst/extdata/appeears/MOD11A2.006_aid0001.nc?raw=true"
+
+# download them
+download.file(lulc_url,destfile="data/MCD12Q1.051_aid0001.nc", mode="wb")
+download.file(lst_url,destfile="data/MOD11A2.006_aid0001.nc", mode="wb")
+
+#Load data into R
+lulc=stack("data/MCD12Q1.051_aid0001.nc",varname="Land_Cover_Type_1")
+lst=stack("data/MOD11A2.006_aid0001.nc",varname="LST_Day_1km")
+```
+
+```{r}
+#Explore the dataset
+plot(lulc)
+
+#Choose one
+lulc=lulc[[13]]
+plot(lulc)
+```
+
+```{r}
+#Process landcover data
+Land_Cover_Type_1 = c(
+    Water = 0, 
+    `Evergreen Needleleaf forest` = 1, 
+    `Evergreen Broadleaf forest` = 2,
+    `Deciduous Needleleaf forest` = 3, 
+    `Deciduous Broadleaf forest` = 4,
+    `Mixed forest` = 5, 
+    `Closed shrublands` = 6,
+    `Open shrublands` = 7,
+    `Woody savannas` = 8, 
+    Savannas = 9,
+    Grasslands = 10,
+    `Permanent wetlands` = 11, 
+    Croplands = 12,
+    `Urban & built-up` = 13,
+    `Cropland/Natural vegetation mosaic` = 14, 
+    `Snow & ice` = 15,
+    `Barren/Sparsely vegetated` = 16, 
+    Unclassified = 254,
+    NoDataFill = 255)
+
+lcd=data.frame(
+  ID=Land_Cover_Type_1,
+  landcover=names(Land_Cover_Type_1),
+  col=c("#000080","#008000","#00FF00", "#99CC00","#99FF99", "#339966", "#993366", "#FFCC99", "#CCFFCC", "#FFCC00", "#FF9900", "#006699", "#FFFF00", "#FF0000", "#999966", "#FFFFFF", "#808080", "#000000", "#000000"),
+  stringsAsFactors = F)
+# colors from https://lpdaac.usgs.gov/about/news_archive/modisterra_land_cover_types_yearly_l3_global_005deg_cmg_mod12c1
+kable(head(lcd))
+```
+
+```{r}
+# convert to raster (easy)
+lulc=as.factor(lulc)
+
+# update the RAT with a left join
+levels(lulc)=left_join(levels(lulc)[[1]],lcd)
+```
+
+```{r}
+# plot it
+gplot(lulc)+
+  geom_raster(aes(fill=as.factor(value)))+
+  scale_fill_manual(values=levels(lulc)[[1]]$col,
+                    labels=levels(lulc)[[1]]$landcover,
+                    name="Landcover Type")+
+  coord_equal()+
+  theme(legend.position = "bottom")+
+  guides(fill=guide_legend(ncol=1,byrow=TRUE))
+```
+
+```{r}
+#Land Surface Temperature
+plot(lst[[1:12]])
+#convert degrees K to degrees C
+offs(lst)=-273.15
+plot(lst[[1:10]])
+```
+
+```{r}
+#add dates
+names(lst)[1:5]
+
+#Convert values to r format
+tdates=names(lst)%>%
+  sub(pattern="X",replacement="")%>%
+  as.Date("%Y.%m.%d")
+
+names(lst)=1:nlayers(lst)
+lst=setZ(lst,tdates)
+```
+```{r}
+#Part 1: Extract timeseries for a point
+#Define projection for point
+lw=SpatialPoints(data.frame(x= -78.791547,y=43.007211))
+
+#Set spatial projection
+projection(lw) <- "+proj=longlat"
+
+#Transform point to projection
+lw_projected <- spTransform(x=lw, CRS("+proj=longlat"))
+
+#Extract the LST data for that location
+lst_f <-raster::extract(lst,lw,buffer=1000,fun=mean,na.rm=T)%>%
+  t()
+
+#Make data frame of dates
+lst_z <- getZ(lst)
+df_lst <- data.frame(x=lst_z, y=lst_f)
+
+#Plot it
+ggplot(df_lst, aes(x=lst_z, y=lst_f)) +
+  geom_smooth()
+```
+
+
+

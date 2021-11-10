@@ -1,7 +1,37 @@
 ---
 title: "Case Study 08"
-author: Your Name
-date: August 1, 2020
-output: github_document
+author: Sadie Kratt
+date: October 26, 2021
+output:
+  html_document: default
+  github_document: default
+  powerpoint_presentation: default
+  word_document: default
 ---
- 
+```{r}
+#load packages
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+
+#Import data
+data <- read.table("ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_annmean_mlo.txt", skip = 56, col.names = c("year", "mean", "unc"))
+
+view(data)
+
+#Make a time series with ggplot
+time_series <-ggplot(data, aes(year, mean)) +
+  geom_line()
+
+time_series
+
+#Make one table
+top_10<-data %>%
+  arrange(desc(mean))%>%
+  top_n(mean,n=10)
+knitr::kable(top_10)
+
+
+
+```

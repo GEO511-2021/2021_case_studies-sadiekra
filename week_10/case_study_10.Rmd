@@ -127,17 +127,41 @@ projection(lw) <- "+proj=longlat"
 lw_projected <- spTransform(x=lw, CRS("+proj=longlat"))
 
 #Extract the LST data for that location
-lst_f <-raster::extract(lst,lw,buffer=1000,fun=mean,na.rm=T)%>%
-  t()
-
+lst_new <-raster::extract(lst,lw,buffer=1000,fun=mean,na.rm=T)%>%
+  t()%>%
 #Make data frame of dates
-lst_z <- getZ(lst)
-df_lst <- data.frame(x=lst_z, y=lst_f)
+as.data.frame()%>%
+mutate(date=getZ(lst))
 
 #Plot it
-ggplot(df_lst, aes(x=lst_z, y=lst_f)) +
-  geom_smooth()
+ggplot(lst_new, aes(x=date, y=V1)) +
+  geom_point() +
+  geom_smooth(span= .01, n=100) +
+  labs(y="Monthly Mean Land Surface Temperature")
+```
+```{r}
+#Part 2: Summarize Weekly data to monthly climatologies
+#Make variable called tmonth
+tmonth <- as.numeric(format(getZ(lst),"%m"))
+#Summarize mean value per month
+lst_month <- stackApply(lst,tmonth,fun=mean)
+names(lst_month)=month.name
 ```
 
+```{r}
+#Plot map for each month using RasterVis' gplot
+gplot(lst_month) +
+  geom_raster(aes(fill=value)) + 
+  facet_wrap(~variable) + 
+  coord_equal()+ 
+  theme(legend.position="right") +
+  scale_fill_gradient(low = "#0000FF", high = "#FF0000")
+```
+```{r}
+#calculate monthly mean
+monthly_mean <- cellStats(lst_month,mean)
+#print monthly mean
+monthly_mean
+```
 
 

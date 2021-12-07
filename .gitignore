@@ -14,3 +14,4 @@
 .netcdf
 .h5
 tests/testthat/test-case_studies.R
+.httr-oauth

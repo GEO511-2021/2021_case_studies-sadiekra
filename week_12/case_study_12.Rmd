@@ -1,7 +1,35 @@
 ---
 title: "Case Study 12"
-author: Your Name
-date: August 1, 2020
+author: Sadie Kratt
+date: December 7, 2021
 output: github_document
+always_allow_html: true
 ---
+```{r}
+library(dplyr)
+library(ggplot2)
+library(ggmap)
+library(htmlwidgets)
+library(widgetframe)
+```
+
+```{r}
+library(tidyverse)
+library(rnoaa)
+library(xts)
+library(dygraphs)
  
+d=meteo_tidy_ghcnd("USW00014733",
+                   date_min = "2016-01-01", 
+                   var = c("TMAX"),
+                   keep_flags=T) %>% 
+   mutate(date=as.Date(date),
+          tmax=as.numeric(tmax)/10) #Divide the tmax data by 10 to convert to degrees.
+```
+
+```{r}
+dxts <- xts(x = d$tmax, order.by=d$date)
+## draw the plot
+dygraph(dxts, main="Daily Maximum Temperature in Buffalo, NY") %>%
+  dyRangeSelector(dateWindow = c("2020-01-01", "2020-10-31")) 
+```

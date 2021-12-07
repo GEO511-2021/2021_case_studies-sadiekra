@@ -1,6 +1,6 @@
 ---
 title: "Case Study 04"
-author: Your Name
+author: Sadie Kratt
 date: August 1, 2020
 output: github_document
 ---
@@ -10,7 +10,25 @@ output: github_document
 Comments
 
 ```{r}
-summary(cars)
+library(tidyverse)
+library(nycflights13)
+str(flights)
+data(flights)
+view(flights)
+view(airports)
+
+flight_arrange <- flights%>%
+  arrange(desc(distance))%>%
+  slice(1)
+
+farthest_airport <-
+  merge(x=flight_arrange, y=airports, by.x = "dest", by.y = "faa", x.all=TRUE, y.all=FALSE )%>%
+  select(name)
+
+farthest_airport <- as.character(farthest_airport)
+class(farthest_airport)
+
+farthest_airport
 ```
 
 ## Second Header
@@ -18,5 +36,5 @@ summary(cars)
 Comments
 
 ```{r}
-plot(pressure)
+
 ```

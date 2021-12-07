@@ -1,7 +1,7 @@
 Case Study 06
 ================
-Your Name
-August 1, 2020
+Sadie Kratt
+10/12/2021
 
 ``` r
 library(raster)

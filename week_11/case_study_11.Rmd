@@ -1,7 +1,52 @@
 ---
 title: "Case Study 11"
-author: Your Name
-date: August 1, 2020
+author: Sadie Kratt
+date: Noveber 16, 2021
 output: github_document
 ---
- 
+```{r}
+library(tidyverse)
+library(spData)
+library(sf)
+library(dplyr)
+
+## New Packages
+library(mapview) # new package that makes easy leaflet maps
+library(foreach)
+library(doParallel)
+registerDoParallel(4)
+getDoParWorkers() # check registered cores
+
+# go to  http://api.census.gov/data/key_signup.html and get a key, then run the line below with your key.  Don't push your key to github!
+library(tidycensus)
+census_api_key("46a60d5e6e691dc8208f4d89f10ece73cdff678b")
+install = TRUE 
+```
+
+```{r}
+library(tidycensus)
+racevars <- c(White = "P005003", 
+              Black = "P005004", 
+              Asian = "P005006", 
+              Hispanic = "P004003")
+
+options(tigris_use_cache = TRUE)
+erie <- get_decennial(geography = "block", variables = racevars, 
+                  state = "NY", county = "Erie County", geometry = TRUE,
+                  summary_var = "P001001", cache_table=T) 
+```
+
+```{r}
+library(dplyr)
+buffalo <- erie%>%
+  st_crop(c(xmin=-78.9,xmax=-78.85,ymin=42.888,ymax=42.92))
+
+buf_dots=
+  foreach(r=unique(buffalo$variable),.combine=rbind)%dopar%{
+    filter(buffalo$variable==r)%>% #one variable at a time
+      st_sample(size=.$value)%>% #generate point for each person randomly
+      st_as_sf()%>% #convert to sf object
+      mutate(variable=r)} #add variable to points
+```
+
+

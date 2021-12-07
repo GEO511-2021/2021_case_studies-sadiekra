@@ -1,7 +1,7 @@
 ---
 title: "Case Study 06"
-author: Your Name
-date: August 1, 2020
+author: Sadie Kratt
+date: 10/12/2021
 output: github_document
 ---
 ```{r}
